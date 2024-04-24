@@ -1,4 +1,7 @@
 {-# OPTIONS -Wall #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# OPTIONS_GHC -Wno-unused-local-binds #-}
 
 --------------------------------------------------------------------------------
 
@@ -14,21 +17,37 @@ module AATree (
   checkTree      -- Ord a => AATree a -> Bool
  ) where
 
+
+
 --------------------------------------------------------------------------------
 
 -- AA search trees
-data AATree a = TODO
+data AATree a = Empty | Node { level :: Int,  left :: AATree a,  value :: a,  right :: AATree a }
   deriving (Eq, Show, Read)
 
+
+
 emptyTree :: AATree a
-emptyTree = error "emptyTree not implemented"
+emptyTree = Empty 
+
+
 
 get :: Ord a => a -> AATree a -> Maybe a
-get = error "get not implemented"
+get _ Empty = Nothing
+get x (Node _ l c r) 
+  | x == c = Just c 
+  | x > c = get x r 
+  | x < c = get x l
+
+
+
 
 -- You may find it helpful to define
---   split :: AATree a -> AATree a
---   skew  :: AATree a -> AATree a
+split :: AATree a -> AATree a
+split  = error "ToDo"
+
+skew  :: AATree a -> AATree a
+skew = error " s d "
 -- and call these from insert.
 insert :: Ord a => a -> AATree a -> AATree a
 insert = error "insert not implemented"
@@ -37,10 +56,22 @@ inorder :: AATree a -> [a]
 inorder = error "inorder not implemented"
 
 size :: AATree a -> Int
-size = error "size not implemented"
+size Empty = 0
+size (Node _ l c r) = 1 + size l + size r 
+
 
 height :: AATree a -> Int
-height = error "height not implemented"
+height Empty = 0
+height (Node value l c r) =  value 
+
+--height (Node _ l c r)
+--  | g > 1 + w = g 
+--  | g < 1 + w = w 
+--   where 
+--    g,w:: Int 
+--    g = 1 + height l
+--    w = 1 + height r
+
 
 --------------------------------------------------------------------------------
 -- Optional function
