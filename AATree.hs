@@ -19,6 +19,7 @@ module AATree (
 
 
 
+
 --------------------------------------------------------------------------------
 
 -- AA search trees
@@ -31,6 +32,13 @@ emptyTree :: AATree a
 emptyTree = Empty 
 
 
+test :: AATree Integer
+test = Node 1 (Node 1 Empty 1 Empty) 2 (Node 1 Empty 3 Empty) 
+
+test1 :: AATree Integer 
+test1 = Node 3 (Node 2 Empty 2 Empty) 7 (Node 3 Empty 15 Empty)
+
+
 
 get :: Ord a => a -> AATree a -> Maybe a
 get _ Empty = Nothing
@@ -38,22 +46,36 @@ get x (Node _ l c r)
   | x == c = Just c 
   | x > c = get x r 
   | x < c = get x l
-
-
+   
 
 
 -- You may find it helpful to define
 split :: AATree a -> AATree a
-split  = error "ToDo"
+split (Node value l c r) = error "ToDo"
 
+--vr = value right
+--vl = value left and so on..
 skew  :: AATree a -> AATree a
-skew = error " s d "
+skew (Node value (Node vr rl rc rr) center (Node vl ll lc lr)) = 
+   Node  value (Node vr rl rc (Node vl ll lc lr)) center (Node value rr lc lr)  
+
+
+
+
+
 -- and call these from insert.
 insert :: Ord a => a -> AATree a -> AATree a
-insert = error "insert not implemented"
+insert x (Node value Empty c Empty) =  Node 1 Empty x Empty
+insert x (Node value left center right) 
+ | x > center = Node value (insert x left) center right 
+ | otherwise = helperFunction (Node value left center right) -- not sure about this one 
+  where 
+    helperFunction tree = skew(split tree) 
+
 
 inorder :: AATree a -> [a]
-inorder = error "inorder not implemented"
+inorder Empty = []
+inorder (Node _ l c r) = inorder l ++ [c] ++ inorder r
 
 size :: AATree a -> Int
 size Empty = 0
@@ -77,7 +99,11 @@ height (Node value l c r) =  value
 -- Optional function
 
 remove :: Ord a => a -> AATree a -> AATree a
-remove = error "remove not implemented"
+remove emptyTree x = x
+remove x y = error "sdsd" 
+
+
+  
 
 --------------------------------------------------------------------------------
 -- Check that an AA tree is ordered and obeys the AA invariants
@@ -93,7 +119,10 @@ checkTree root =
 
 -- True if the given list is ordered
 isSorted :: Ord a => [a] -> Bool
-isSorted = error "isSorted not implemented"
+isSorted [] = True
+isSorted (x:y:xs) = x < y && isSorted xs 
+
+  
 
 -- Check if the invariant is true for a single AA node
 -- You may want to write this as a conjunction e.g.
