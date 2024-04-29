@@ -44,7 +44,11 @@ test = Node 1 (Node 1 Empty 1 Empty) 2 (Node 1 Empty 3 Empty)
 test1 :: AATree Integer 
 test1 = Node 3 (Node 2 Empty 2 Empty) 7 (Node 3 Empty 15 Empty)
 
+test3 :: AATree Integer
+test3 = Node 2 (Node 1 Empty 2 Empty) 15 (Node 2 Empty 7 Empty)
 
+testSkew :: Bool
+testSkew | skew (test3) == Node 1 
 testList :: [Integer]
 testList = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,3,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100]
 
@@ -66,23 +70,37 @@ get x (Node _ l c r)
 -- in order for the pattern-match to work, split needs to be called at the leftmost node in the 4-node (x in the example above).
 split :: AATree a -> AATree a
 split (Node levelx lx cx (Node levely ly cy (Node levelz lz cz rz))) = Node (levely+1) (Node levelx lx cx ly) cy (Node levelz lz cz rz)
+split a = a
 
 --vr = value right
 --vl = value left and so on..
+--skew  :: AATree a -> AATree a
+--skew (Node value (Node vr rl rc rr) center (Node vl ll lc lr)) = 
+--   Node value (Node vr rl rc (Node vl ll lc lr)) center (Node value rr lc lr)
+
+--    x <- y    becomes   x -> y
+--   /\    \             /    /\
+--  A  B    C           A     B C
 skew  :: AATree a -> AATree a
-skew (Node value (Node vr rl rc rr) center (Node vl ll lc lr)) = 
-   Node value (Node vr rl rc (Node vl ll lc lr)) center (Node value rr lc lr)
+skew (Node levelY (Node levelX rightX valueX leftX) valueY (Node levelC Empty valueC Empty)) = 
+  Node levelX leftX valueX (Node levelY rightX valueY (Node levelC Empty valueC Empty))
 
 -- "A node's level must be greater than its left child:"
 
 -- and call these from insert.
 -- the 3 cases 
 insert :: Ord a => a -> AATree a -> AATree a
-insert x (Node value Empty c Empty) =  Node 1 Empty x Empty
-insert x (Node value left center right) 
- | x < center = Node value (insert x left) center right 
- | x > center = Node value left center (insert x right)
- | otherwise = helperFunction (Node value left center right) -- not sure about this one
+insert x (Node level Empty value Empty) =  Node 1 Empty x Empty
+insert x (Node level Empty value (Node l Empty v Empty)) -- Has right child but no grandchildren
+  | x < value = split (skew (Node level (Node level Empty x Empty) value (Node l Empty v Empty)))  -- here we should check for skew
+  | otherwise = (Node level Empty value (insert x  (Node l Empty v Empty)))
+insert x (Node level left value Empty)
+  | x > value = (Node level left value (Node level Empty x Empty))
+  | otherwise = (Node level (insert x left) value Empty)
+insert x (Node level left value right) 
+ | x < value = Node level (insert x left) value right 
+ | x > value = Node level left value (insert x right)
+ | otherwise = helperFunction (Node level left value right) -- not sure about this one
   where 
     helperFunction tree = split(skew tree)
     
@@ -99,7 +117,7 @@ size (Node _ l c r) = 1 + size l + size r
 
 height :: AATree a -> Int
 height Empty = 0
-height (Node value l c r) = value 
+height (Node level l c r) = level 
 
 
 
@@ -135,7 +153,7 @@ isSorted (x:y:xs) = x < y && isSorted xs
 -- A node's level must be greater than its left child: level(node) > level(node.left)
 -- And also greater than its right-right grandchild: level(node) > level(node.right.right)
 checkLevels :: AATree a -> Bool
-checkLevels (Node value l c r ) = (value == valueRight) && (value == valueLeft + 1) && (value == valueGrandChild + 2 )
+checkLevels (Node value l c r) = (value == valueRight) && (value == valueLeft + 1) && (value == valueGrandChild + 2)
  where 
    Node valueRight _ _ rr = rightSub l
    Node valueLeft  _ _ _ = leftSub r
