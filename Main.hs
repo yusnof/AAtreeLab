@@ -7,13 +7,15 @@
 -}
 
 import AATree
+import Data.List hiding (insert)
 
 --------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
   contents <- getContents
-
+  xs <- (splitOn " " contents)
+  foldl insert xs emptyTree
   -- split the data into words and build an AA tree
   -- use foldl
   undefined
