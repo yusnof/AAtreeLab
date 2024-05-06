@@ -166,7 +166,7 @@ isSorted (x:y:xs) = x < y && isSorted xs
 -- And also greater than its right-right grandchild: level(node) > level(node.right.right)
 checkLevels :: AATree a -> Bool
 checkLevels (Node level Empty c Empty) = level == 1 -- we need to check when rightSub and leftSub is Empty
-checkLevels (Node level left c right) = level > height left && level > height (rightSub right)
+checkLevels (Node level left c right) = level >h height left && level > height (rightSub right)
 
  
 isEmpty :: AATree a -> Bool
