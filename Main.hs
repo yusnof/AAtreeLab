@@ -22,6 +22,7 @@ main = do
   
 buildTree :: [String] -> AATree String
 buildTree = foldl (flip insert) emptyTree
+<<<<<<< HEAD
 
 printStatistics:: AATree String -> IO ()
 printStatistics tree = do
@@ -53,4 +54,25 @@ first20 tree = format (take 20 (inorder tree))
   --undefined
 
 --------------------------------------------------------------------------------
+=======
+>>>>>>> fb800ceeffd7c37ad7ce0f264666bb8fac577318
 
+printStatistics:: AATree String -> IO ()
+printStatistics tree = do
+  let s= size tree
+  let h = height tree
+  let optimalHeight = logBase 2 (fromIntegral (s+1))-1 -- optimal height: [log(n+1)]-1
+  let optimalHeightRatio = fromIntegral h / optimalHeight
+  putStrLn ("Size: "++ show s)
+  putStrLn ("Height: "++show h)
+  putStrLn ("Optimal height: "++ show optimalHeight)
+  putStrLn ("height / optimal heigth: "++ show optimalHeightRatio)
+  print    (checkTree tree)
+  putStrLn ("First 20 words: "++ first20 tree)
+      
+first20 :: AATree String -> [Char]
+first20 tree = format (take 20 (inorder tree))
+  where
+    format [] = ""
+    format [x] = x
+    format (x:xs) = x ++ " " ++ format xs 
