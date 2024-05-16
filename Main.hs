@@ -22,9 +22,6 @@ main = do
   
 buildTree :: [String] -> AATree String
 buildTree = foldl (flip insert) emptyTree
-optimalHeight:: Int -> Int
-optimalHeight s =  round (logBase 2 (fromIntegral (s+1))-1) -- optimal height: [log(n+1)]-1
-
 
 printStatistics:: AATree String -> IO ()
 printStatistics tree = do
