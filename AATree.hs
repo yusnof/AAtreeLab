@@ -115,7 +115,6 @@ checkTree root =
 -- O(n)
 isSorted :: Ord a => [a] -> Bool
 isSorted [] = True
---isSorted [x] = True
 isSorted (x:y:xs) = x < y && isSorted xs  
 isSorted _ = True  
   
@@ -131,9 +130,12 @@ O(n)
 checkLevels :: AATree a -> Bool
 checkLevels Empty = True
 checkLevels (Node level left _ right) = 
-  level > height left &&
-  level >= height right &&
-  level > height (rightSub right)
+  level >=  getLvl left &&
+  level >= getLvl right &&
+  level > getLvl (rightSub right)
+   where
+    getLvl Empty = 0
+    getLvl (Node lvl _ _ _) = lvl 
 
 --O(1)
 isEmpty :: AATree a -> Bool
